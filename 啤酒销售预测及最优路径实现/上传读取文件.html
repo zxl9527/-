@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>最优路径主页</title>
+</head>
+<body>
+<h2>1.上传Excel或CSV文件（注意文件格式）</h2>
+ 创建一个文件上传的表单
+<form action="http://127.0.0.1:5000/uploads" method="POST" enctype="multipart/form-data">
+  <!-- 文件选择控件 -->
+  <input type="file" id="fileInput" name="file" accept=".xls, .xlsx, .csv" required>
+  <!-- 提交按钮 -->
+  <input type="submit" value="上传">
+</form>
+
+<script>
+// 获取文件输入元素
+var fileInput = document.getElementById('fileInput');
+
+// 监听文件选择变化
+fileInput.addEventListener('change', function() {
+  // 获取文件
+  var file = fileInput.files[0];
+
+  // 检查文件类型
+  if (!['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'].includes(file.type)) {
+    alert('请选择一个Excel或CSV文件（.xls、.xlsx或.csv）');
+    // 清空选择的文件
+    fileInput.value = '';
+  }
+});
+</script>

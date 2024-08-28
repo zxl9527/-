@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>最优路径规划</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+        }
+        .input-card .btn{
+            margin-right: 1.2rem;
+            width: 9rem;
+        }
+        .input-card .btn:last-child{
+            margin-right: 0;
+        }
+        #panel {
+            position: fixed;
+            background-color: white;
+            max-height: 80%;
+            overflow-y: auto;
+            top: 10px;
+            right: 10px;
+            width: 280px;
+        }
+        #panel .amap-lib-driving {
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .waypoint-marker {
+            background-color: red;
+            border: 0 solid #999;
+            border-radius: 50%;
+            padding: 2px;
+            font-size: 18px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="panel"></div>
+    <div class="input-card">
+        <h4>轨迹回放控制</h4>
+        <div class="input-item">
+            <input type="button" class="btn" value="开始动画" id="start" onclick="startAnimation()"/>
+            <input type="button" class="btn" value="暂停动画" id="pause" onclick="pauseAnimation()"/>
+        </div>
+        <div class="input-item">
+            <input type="button" class="btn" value="继续动画" id="resume" onclick="resumeAnimation()"/>
+            <input type="button" class="btn" value="停止动画" id="stop" onclick="stopAnimation()"/>
+        </div>
+    </div>
+    <script>window._AMapSecurityConfig = {
+        securityJsCode: "e3b02aa7b23dd208551919c07eb9e555"
+    };
+    </script>
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=29af353df5c0aa335aabe29803314654"></script>
+    <script>
+        var map = new AMap.Map("container", {
+            resizeEnable: true,
+            center: [106.487482, 29.466757],
+            zoom: 20
+        });
+
+        AMap.plugin(['AMap.ToolBar', 'AMap.Driving', 'AMap.MoveAnimation'], function() {
+            var toolbar = new AMap.ToolBar();
+            map.addControl(toolbar);
+            var driving = new AMap.Driving({
+                policy: AMap.DrivingPolicy.LEAST_DISTANCE,
+                map: map,
+                panel: "panel"
+            });
+
+            fetch('optimal_path.json')
+                .then(response => response.json())
+                .then(data => {
+                    var startLngLat = [106.480936,29.460931];
+                    var endLngLat = [106.480936,29.460931];
+                    // 将字符串格式的坐标转换为数组格式的坐标
+                    var waypoints = data.map(coord => {
+                        var [lng, lat] = coord.split(',').map(Number);
+                        return [lng, lat];
+                    });
+                    console.log(waypoints);
+
+                    var currentStart = startLngLat;
+                    var marker = new AMap.Marker({
+                        map: map,
+                        position: startLngLat,
+                        icon: 'https://a.amap.com/jsapi_demos/static/demo-center-v2/car.png',
+                        offset: new AMap.Pixel(-13, -26),
+                        autoRotation: true
+                    });
+
+                    var batches = [];
+                    for (var i = 0, len = waypoints.length; i < len; i += 16) {
+                        batches.push(waypoints.slice(i, i + 16));
+                    }
+
+                    var batchPromises = batches.map(function(batch, index) {
+                        batch.unshift(currentStart);
+                        currentStart = batch[batch.length - 1];
+                        var batchEnd = index === batches.length - 1 ? endLngLat : batch[batch.length - 1];
+                        return new Promise(function(resolve, reject) {
+                            driving.search(batch[0], batchEnd, { waypoints: batch.slice(1, -1) }, function(status, result) {
+                                if (status === 'complete') {
+                                    resolve(result);
+                                    currentStart = batch[batch.length - 1];
+
+                                    var globalIndex = index * 16;
+                                    batch.forEach(function(waypoint, indexInBatch) {
+                                        if (indexInBatch > 0) {
+                                            var marker = new AMap.Marker({
+                                                position: waypoint,
+                                                content: '<div class="waypoint-marker">' + (globalIndex + indexInBatch) + '</div>',
+                                                offset: new AMap.Pixel(-10, -10)
+                                            });
+                                            marker.setMap(map);
+                                        }
+                                    });
+                                } else {
+                                    reject(result);
+                                }
+                            });
+                        });
+                    });
+
+                    Promise.all(batchPromises).then(function(results) {
+                        var fullPath = results.reduce(function(acc, result) {
+                            return acc.concat(result.routes[0].steps.map(function(step) {
+                                return step.path;
+                            }).reduce(function(pathAcc, path) {
+                                return pathAcc.concat(path);
+                            }, []));
+                        }, []);
+
+                        var polyline = new AMap.Polyline({
+                            map: map,
+                            path: fullPath,
+                            showDir: true,
+                            strokeColor: "#28F",
+                            strokeWeight: 6,
+                        });
+
+                        var passedPolyline = new AMap.Polyline({
+                            map: map,
+                            strokeColor: "#AF5",
+                            strokeWeight: 6,
+                        });
+
+                        marker.on('moving', function(e) {
+                            passedPolyline.setPath(e.passedPath);
+                            map.setCenter(e.target.getPosition(), true);
+                        });
+
+                        map.setFitView();
+
+                        window.startAnimation = function startAnimation() {
+                            marker.moveAlong(fullPath, {
+                                duration: 300,
+                            });
+                        };
+
+                        window.pauseAnimation = function() {
+                            marker.pauseMove();
+                        };
+
+                        window.resumeAnimation = function() {
+                            marker.resumeMove();
+                        };
+
+                        window.stopAnimation = function() {
+                            marker.stopMove();
+                        };
+
+                    }).catch(function(error) {
+                        console.error('路径规划失败:', error);
+                    });
+                })
+                .catch(error => {
+                    console.error('加载 JSON 文件失败:', error);
+                });
+        });
+    </script>
+</body>
+</html>

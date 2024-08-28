@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>啤酒销量预测与配送优化平台</title>
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  header {
+    text-align: center;
+    width: 100%;
+  }
+  nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+  nav ul li {
+    display: inline;
+    margin-right: 2vw; /* 使用视口宽度单位 */
+  }
+  nav ul li a {
+    text-decoration: none;
+    color: black;
+  }
+  .image-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 70vw; /* 使用视口宽度单位 */
+    margin-top: 5vh; /* 使用视口高度单位 */
+  }
+  .image-container img {
+    max-width: 30vw; /* 使用视口宽度单位，限制图片最大宽度 */
+    height: auto;
+    margin-bottom: 2vh; /* 使用视口高度单位 */
+  }
+  .image-label {
+    text-align: center;
+    font-size: 2vw; /* 使用视口宽度单位 */
+  }
+  footer {
+    width: 100%;
+    text-align: center;
+    margin-top: auto;
+    padding: 2vh 0; /* 使用视口高度单位 */
+  }
+  footer nav ul {
+    justify-content: center;
+  }
+
+  /* 媒体查询，针对小屏幕 */
+  @media (max-width: 768px) {
+    nav ul li {
+      margin-right: 1vw; /* 使用视口宽度单位 */
+    }
+    .image-container {
+      justify-content: center;
+    }
+    .image-container img {
+      width: 90vw; /* 使用视口宽度单位 */
+    }
+    .image-label {
+      font-size: 4vw; /* 使用视口宽度单位 */
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>啤酒销量预测与配送优化平台</h1>
+  <nav>
+    <ul>
+      <li><a href="index.html">首页</a></li>
+      <li><a href="销量预测使用示例.html">销量预测</a></li>
+      <li><a href="路径优化使用示例.html">路径优化</a></li>
+      <li><a href="http://tianqi.2345.com" target="_blank">访问重庆天气</a></li>
+      <li><a href="https://wia.amap.com/" target="_blank">高德顺路规划</a> </li>
+      <li><a href="about.html">关于我们</a></li>
+    </ul>
+  </nav>
+    <br>
+    <br>
+  <div class="image-container">
+    <div>
+      <a href="销量预测.zip" target="_self">
+        <img src="图片/销量预测.png" title="点击获取销量预测文件"height="400" width="400" alt="销量预测图片" />
+        <div class="image-label">下载销量预测.zip</div>
+      </a>
+    </div>
+    <div>
+      <a href="路径优化.zip" target="_self">
+        <img src="图片/路径优化.png" title="点击获取路径优化文件" height="400" width="400" alt="路径优化图片" />
+        <div class="image-label">下载路径优化.zip</div>
+      </a>
+    </div>
+  </div>
+</header>
+
+<footer>
+  <p>&copy; 2024 啤酒销量预测与配送优化平台</p>
+  <p>Email: hejegsvfd229@gmail.com</p>
+  <nav>
+    <ul>
+      <li><a href="privacy.html">隐私政策</a></li>
+      <li><a href="terms.html">使用条款</a></li>
+      <li><a href="contact.html">联系方式</a></li>
+    </ul>
+  </nav>
+</footer>
+</body>
+</html>

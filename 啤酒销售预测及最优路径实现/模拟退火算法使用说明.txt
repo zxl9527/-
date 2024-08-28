@@ -1,0 +1,23 @@
+1.确保您已安装python解释器（python , pycharm等），确保您的python解释器安装所必须的第三方库。
+
+pandas: 用于数据分析的强大库。
+requests: 用于发起HTTP请求的库。
+concurrent.futures: Python 标准库的一部分，但 ThreadPoolExecutor 和 as_completed 需要从 concurrent.futures 模块导入。
+tqdm: 提供进度条功能的库。
+Flask: 用于创建Web应用的微框架。
+chardet: 用于检测字符编码的库。
+
+安装方式：
+python官网下载安装https://www.python.org/
+在cmd终端输入命令： pip install pandas requests tqdm Flask chardet
+
+
+2.路径依赖已配置好，在下载的zip文件解压后无需配置。
+第一步：打开运行app，启动flask
+第二步：上传Excel或csv文件（文件须包括"日期","地址"栏，注意文件格式）
+第三步：运行模拟退火算法获取最优路径
+#第四步：查看最优路径（可跳过）
+第五步：打开网站主页或高德顺路规划https://wia.amap.com/，将导入模板.xlsx导入，手机即可开始导航（注意使用同一个账号）
+
+
+3.如果您的路径规划需求较大，可前往高德官网申请您的专属API_KEY ，并将模拟退火算法求解.py中的API_KEY替换为自己的。
